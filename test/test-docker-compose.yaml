@@ -1,0 +1,30 @@
+services:
+  kea4:
+    image: docker.cloudsmith.io/isc/docker/kea-dhcp4:2.5.2
+    restart: always
+    networks:
+      kea-10-ipvlan:
+        ipv4_address: 10.0.0.254
+    volumes:
+      - type: bind
+        source: ../config/kea-dhcp4.conf
+        target: /etc/kea/kea-dhcp4.conf
+
+  busybox:
+    image: busybox
+    restart: always
+    tty: true
+    networks:
+      kea-10-ipvlan:
+    volumes:
+      - type: bind
+        source: ../config/default.script
+        target: /usr/share/udhcpc/default.script
+
+networks:
+  kea-10-ipvlan:
+    name: kea-10-ipvlan
+    driver: ipvlan
+    ipam:
+      config:
+        - subnet: 10.0.0.0/24
